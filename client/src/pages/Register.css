@@ -1,0 +1,7 @@
+@import './Login.css'; 
+
+.register-hint {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin-top: 0.25rem;
+}
