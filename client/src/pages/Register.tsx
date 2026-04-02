@@ -10,17 +10,17 @@ export default function Register() {
         <form>
           <div className="form-group">
             <label htmlFor="username">Username</label>
-            <input type="text" id="username" placeholder="remote_worker_99" required />
+            <input type="text" id="username" required />
           </div>
 
           <div className="form-group">
             <label htmlFor="email">Email address</label>
-            <input type="email" id="email" placeholder="name@example.com" required />
+            <input type="email" id="email" required />
           </div>
           
           <div className="form-group">
             <label htmlFor="password">Password</label>
-            <input type="password" id="password" placeholder="••••••••" required />
+            <input type="password" id="password" required />
             <p className="register-hint">Password must be at least 6 characters.</p>
           </div>
           

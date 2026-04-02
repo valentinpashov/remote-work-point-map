@@ -5,17 +5,17 @@ export default function Login() {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h2 className="auth-title">Sign in to WorkStation</h2>
+        <h2 className="auth-title">Sign in</h2>
         
         <form>
           <div className="form-group">
             <label htmlFor="email">Email address</label>
-            <input type="email" id="email" placeholder="name@example.com" required />
+            <input type="email" id="email" required />
           </div>
           
           <div className="form-group">
             <label htmlFor="password">Password</label>
-            <input type="password" id="password" placeholder="••••••••" required />
+            <input type="password" id="password" required />
           </div>
           
           <button type="submit" className="auth-submit">Sign In</button>
