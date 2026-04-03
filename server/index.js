@@ -34,6 +34,7 @@ app.get('/api/users', async (req, res) => {
     }
 });
 
+// Register
 app.post('/api/register', async (req, res) => {
     try {
         const { username, email, password } = req.body;
@@ -58,6 +59,41 @@ app.post('/api/register', async (req, res) => {
             id: newUser.rows[0].id,
             username: newUser.rows[0].username,
             email: newUser.rows[0].email
+        });
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server error");
+    }
+});
+
+// Login
+app.post('/api/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // Check if the user exists
+        const user = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+        
+        // If no user with that email exists => error
+        if (user.rows.length === 0) {
+            return res.status(401).json({ error: "Invalid email or password!" });
+        }
+
+        // 3. Check the password 
+        const validPassword = await bcrypt.compare(password, user.rows[0].password_hash);
+        
+        // If the password doesn't match
+        if (!validPassword) {
+            return res.status(401).json({ error: "Invalid email or password!" });
+        }
+
+        // 4. Everything is successful
+        res.json({
+            message: "Successful login!",
+            id: user.rows[0].id,
+            username: user.rows[0].username,
+            email: user.rows[0].email
         });
 
     } catch (err) {
