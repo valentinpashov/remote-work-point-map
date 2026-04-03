@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
 require('dotenv').config();
+const bcrypt = require('bcrypt');
 
 const app = express();
 
@@ -30,6 +31,38 @@ app.get('/api/users', async (req, res) => {
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Грешка в сървъра');
+    }
+});
+
+app.post('/api/register', async (req, res) => {
+    try {
+        const { username, email, password } = req.body;
+
+        // Check if the user already exists
+        const userExists = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+        if (userExists.rows.length > 0) {
+            return res.status(401).json({ error: "User with this email already exists!" });
+        }
+
+        // Password hashing
+        const salt = await bcrypt.genSalt(10);
+        const bcryptPassword = await bcrypt.hash(password, salt);
+
+        // Insert the new user into the database
+        const newUser = await pool.query(
+            "INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING *",
+            [username, email, bcryptPassword]
+        );
+
+        res.json({
+            id: newUser.rows[0].id,
+            username: newUser.rows[0].username,
+            email: newUser.rows[0].email
+        });
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server error");
     }
 });
 
