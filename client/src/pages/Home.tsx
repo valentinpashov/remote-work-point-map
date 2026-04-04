@@ -20,6 +20,16 @@ export default function Home() {
 
       <div className="flex flex-1 gap-6 min-h-0">
 
+        <div className="w-80 bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex flex-col hidden md:flex">
+          <h2 className="text-lg font-extrabold text-gray-800 border-b border-gray-100 pb-4 mb-4">
+            Locations
+          </h2>
+
+          <div className="flex-1 overflow-y-auto space-y-3 pr-2">
+
+          </div>
+        </div>
+
         <div className="flex-1 rounded-xl shadow-sm border border-gray-200 overflow-hidden relative z-0">
           <MapContainer 
             center={center} 
