@@ -16,27 +16,33 @@ export default function Home() {
   const center: [number, number] = [42.6977, 23.3219];
 
   return (
-    <div className="h-full w-full">
-      <MapContainer 
-        center={center} 
-        zoom={13} 
-        scrollWheelZoom={true}
-        className="h-full w-full z-0"
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        
-        <Marker position={center}>
-          <Popup>
-            <div className="font-sans">
-              <h3 className="font-bold">Начална точка</h3>
-              <p className="text-sm text-gray-600">Добре дошли!</p>
-            </div>
-          </Popup>
-        </Marker>
-      </MapContainer>
+    <div className="flex flex-col h-full bg-gray-100 p-6 gap-6 font-sans">
+
+      <div className="flex flex-1 gap-6 min-h-0">
+
+        <div className="flex-1 rounded-xl shadow-sm border border-gray-200 overflow-hidden relative z-0">
+          <MapContainer 
+            center={center} 
+            zoom={13} 
+            scrollWheelZoom={true}
+            className="h-full w-full"
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            
+            <Marker position={center}>
+              <Popup>
+                <div className="font-sans">
+                  <h3 className="font-bold">Start point</h3>
+                </div>
+              </Popup>
+            </Marker>
+          </MapContainer>
+        </div>
+
+      </div>
     </div>
   );
 }
