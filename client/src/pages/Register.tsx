@@ -25,7 +25,6 @@ export default function Register() {
       const data = await response.json();
 
       if (response.ok) {
-        alert('Success! You can now log in to your account.');
         navigate('/login');
       } else {
         setError(data.error || 'An error occurred during registration.');
