@@ -102,6 +102,17 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
+// Get all locations from the database
+app.get('/api/locations', async (req, res) => {
+    try {
+        const allLocations = await pool.query('SELECT * FROM locations');
+        res.json(allLocations.rows);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server error while fetching locations');
+    }
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`The server is listening on port ${PORT}`);
