@@ -23,7 +23,37 @@ export default function Navbar() {
         </span>
       </Link>
       
-      
+      <div className="flex items-center gap-3">
+        {user ? (
+          <div className="flex items-center gap-4">
+            <span className="text-sm font-medium text-gray-600">
+              Welcome, <span className="font-bold text-gray-800">{user.username}</span>
+            </span>
+            <button 
+              onClick={handleLogout}
+              className="px-5 py-2.5 text-sm font-semibold bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
+            >
+              Logout
+            </button>
+          </div>
+        ) : (
+          <>
+            <Link 
+              to="/login" 
+              className="px-5 py-2.5 text-sm font-semibold text-gray-700 rounded-lg hover:bg-gray-50 hover:text-blue-700 transition-colors"
+            >
+              Login
+            </Link>
+            
+            <Link 
+              to="/register" 
+              className="px-5 py-2.5 text-sm font-semibold bg-blue-600 text-white rounded-lg hover:bg-blue-700 hover:shadow-md transition-all transform active:scale-95"
+            >
+              Register
+            </Link>
+          </>
+        )}
+      </div>
     </nav>
   );
 }
