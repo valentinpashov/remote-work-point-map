@@ -113,6 +113,27 @@ app.get('/api/locations', async (req, res) => {
     }
 });
 
+// Save a new location to the database
+app.post('/api/locations', async (req, res) => {
+    try {
+        const { user_id, title, description, latitude, longitude } = req.body;
+
+        if (!user_id || !title || !latitude || !longitude) {
+            return res.status(400).json({ error: "Please fill in all required fields!" });
+        }
+
+        const newLocation = await pool.query(
+            "INSERT INTO locations (user_id, title, description, latitude, longitude) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+            [user_id, title, description, latitude, longitude]
+        );
+        res.json(newLocation.rows[0]);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error while saving the location');
+    }
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`The server is listening on port ${PORT}`);
