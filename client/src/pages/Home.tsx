@@ -1,18 +1,7 @@
 import { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-import SearchBar from '../components/SearchBar'; 
-
-const DefaultIcon = L.icon({
-    iconUrl: markerIcon,
-    shadowUrl: markerShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
-});
-L.Marker.prototype.options.icon = DefaultIcon;
+import TopBar from '../components/TopBar';
+import Sidebar from '../components/SideBar'; 
+import MapView from '../components/MapView';
 
 interface Location {
   id: number;
@@ -22,20 +11,7 @@ interface Location {
   longitude: string | number;
 }
 
-function MapFlyController({ coords }: { coords: [number, number] | null }) {
-  const map = useMap();
-  useEffect(() => {
-    if (coords) {
-      map.flyTo(coords, 16, { 
-        duration: 1.5 
-      });
-    }
-  }, [coords, map]);
-  return null;
-}
-
 export default function Home() {
-  const center: [number, number] = [42.6977, 23.3219]; 
   const [locations, setLocations] = useState<Location[]>([]);
   const [activeCoords, setActiveCoords] = useState<[number, number] | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -50,76 +26,62 @@ export default function Home() {
       .catch(err => console.error("Error loading locations:", err));
   }, []);
 
+  const handleAddLocation = async (title: string, description: string, lat: number, lng: number) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/locations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: user.id, title, description, latitude: lat, longitude: lng })
+      });
+
+      if (response.ok) {
+        const savedLocation = await response.json();
+        setLocations([...locations, savedLocation]);
+        return true;
+      } else {
+        alert('Error saving location.');
+        return false;
+      }
+    } catch (err) {
+      console.error(err);
+      alert('No connection to the server.');
+      return false;
+    }
+  };
+
   const filteredLocations = locations.filter((loc) => {
     const searchLower = searchTerm.toLowerCase();
     const titleMatch = loc.title.toLowerCase().includes(searchLower);
     const descMatch = loc.description ? loc.description.toLowerCase().includes(searchLower) : false;
-    
     return titleMatch || descMatch;
   });
 
   return (
     <div className="flex flex-col h-full bg-gray-100 p-6 gap-6 font-sans">
-      <div className="bg-white px-6 py-4 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4 z-10">
-        <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 font-semibold rounded-lg text-sm whitespace-nowrap">
-          {user ? `Hello, ${user.username}` : '👀 Guest Mode'}
-        </div>
-
-        <div className="flex-1 w-full flex justify-center">
-          <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-        </div>
-
-        <div className="text-sm text-gray-500 font-semibold whitespace-nowrap">
-          Found: <span className="text-blue-600">{filteredLocations.length}</span> / {locations.length}
-        </div>
-      </div>
+      
+      <TopBar 
+        user={user} 
+        searchTerm={searchTerm} 
+        setSearchTerm={setSearchTerm} 
+        filteredCount={filteredLocations.length} 
+        totalCount={locations.length} 
+      />
 
       <div className="flex flex-1 gap-6 min-h-0">
-        <div className="w-80 bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex flex-col hidden md:flex">
-          <h2 className="text-lg font-extrabold text-gray-800 border-b border-gray-100 pb-4 mb-4">
-            List of Places
-          </h2>
-          
-          <div className="flex-1 overflow-y-auto space-y-3 pr-2">
-            {filteredLocations.length === 0 ? (
-              <p className="text-sm text-gray-500 italic">Not found</p>
-            ) : (
-              filteredLocations.map((loc) => (
-                <div 
-                  key={loc.id} 
-                  onClick={() => setActiveCoords([Number(loc.latitude), Number(loc.longitude)])}
-                  className="p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-blue-500 hover:bg-blue-50 hover:shadow-md cursor-pointer transition-all"
-                >
-                  <h3 className="font-bold text-gray-800 text-sm">{loc.title}</h3>
-                  {loc.description && <p className="text-xs text-gray-500 mt-1 line-clamp-2">{loc.description}</p>}
-                </div>
-              ))
-            )}
-          </div>
-        </div>
+        
+        <Sidebar 
+          locations={filteredLocations} 
+          onLocationClick={setActiveCoords} 
+        />
+        
+        <MapView 
+          locations={filteredLocations} 
+          activeCoords={activeCoords}
+          setActiveCoords={setActiveCoords}
+          user={user}
+          onAddLocation={handleAddLocation}
+        />
 
-        <div className="flex-1 rounded-xl shadow-sm border border-gray-200 overflow-hidden relative z-0">
-          <MapContainer center={center} zoom={13} scrollWheelZoom={true} className="h-full w-full">
-            <TileLayer
-              attribution='&copy; OpenStreetMap'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            
-            <MapFlyController coords={activeCoords} />
-
-            {filteredLocations.map((loc) => (
-              <Marker key={loc.id} position={[Number(loc.latitude), Number(loc.longitude)]}>
-                <Popup>
-                  <div className="font-sans min-w-[200px]">
-                    <h3 className="font-bold text-lg text-gray-800">{loc.title}</h3>
-                    <p className="text-sm text-gray-600 mt-1">{loc.description}</p>
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
-
-          </MapContainer>
-        </div>
       </div>
     </div>
   );
