@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'; // Премахнах useMapEvents от тук
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'; // Добавихме useMap
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
@@ -21,9 +21,24 @@ interface Location {
   longitude: string | number;
 }
 
+function MapFlyController({ coords }: { coords: [number, number] | null }) {
+  const map = useMap(); // Взимаме контрола над картата
+
+  useEffect(() => {
+    if (coords) {
+      map.flyTo(coords, 16, {
+        duration: 1.5
+      });
+    }
+  }, [coords, map]);
+
+  return null; 
+}
+
 export default function Home() {
   const center: [number, number] = [42.6977, 23.3219]; 
   const [locations, setLocations] = useState<Location[]>([]);
+  const [activeCoords, setActiveCoords] = useState<[number, number] | null>(null);
   
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
@@ -40,7 +55,7 @@ export default function Home() {
       <div className="bg-white px-6 py-4 rounded-xl shadow-sm border border-gray-200 flex items-center justify-between z-10">
         <div className="flex gap-4">
           <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 font-semibold rounded-lg text-sm">
-            {user ? `${user.username}` : '👀 Режим Гост'}
+            {user ? `${user.username}` : 'Guest Mode'}
           </div>
         </div>
         <div className="text-sm text-gray-500 font-semibold">
@@ -59,7 +74,11 @@ export default function Home() {
               <p className="text-sm text-gray-500 italic">No places added yet.</p>
             ) : (
               locations.map((loc) => (
-                <div key={loc.id} className="p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-blue-400 hover:shadow-sm cursor-pointer transition-all">
+                <div 
+                  key={loc.id} 
+                  onClick={() => setActiveCoords([Number(loc.latitude), Number(loc.longitude)])}
+                  className="p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-blue-500 hover:bg-blue-50 hover:shadow-md cursor-pointer transition-all"
+                >
                   <h3 className="font-bold text-gray-800 text-sm">{loc.title}</h3>
                   {loc.description && <p className="text-xs text-gray-500 mt-1 line-clamp-2">{loc.description}</p>}
                 </div>
@@ -75,6 +94,8 @@ export default function Home() {
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             
+            <MapFlyController coords={activeCoords} />
+
             {locations.map((loc) => (
               <Marker key={loc.id} position={[Number(loc.latitude), Number(loc.longitude)]}>
                 <Popup>
