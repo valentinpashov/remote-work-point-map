@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'; // Добавихме useMap
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+import SearchBar from '../components/SearchBar'; 
 
 const DefaultIcon = L.icon({
     iconUrl: markerIcon,
@@ -22,23 +23,22 @@ interface Location {
 }
 
 function MapFlyController({ coords }: { coords: [number, number] | null }) {
-  const map = useMap(); // Взимаме контрола над картата
-
+  const map = useMap();
   useEffect(() => {
     if (coords) {
-      map.flyTo(coords, 16, {
-        duration: 1.5
+      map.flyTo(coords, 16, { 
+        duration: 1.5 
       });
     }
   }, [coords, map]);
-
-  return null; 
+  return null;
 }
 
 export default function Home() {
   const center: [number, number] = [42.6977, 23.3219]; 
   const [locations, setLocations] = useState<Location[]>([]);
   const [activeCoords, setActiveCoords] = useState<[number, number] | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
   
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
@@ -47,19 +47,30 @@ export default function Home() {
     fetch('http://localhost:5000/api/locations')
       .then(res => res.json())
       .then(data => setLocations(data))
-      .catch(err => console.error("Грешка при зареждане:", err));
+      .catch(err => console.error("Error loading locations:", err));
   }, []);
+
+  const filteredLocations = locations.filter((loc) => {
+    const searchLower = searchTerm.toLowerCase();
+    const titleMatch = loc.title.toLowerCase().includes(searchLower);
+    const descMatch = loc.description ? loc.description.toLowerCase().includes(searchLower) : false;
+    
+    return titleMatch || descMatch;
+  });
 
   return (
     <div className="flex flex-col h-full bg-gray-100 p-6 gap-6 font-sans">
-      <div className="bg-white px-6 py-4 rounded-xl shadow-sm border border-gray-200 flex items-center justify-between z-10">
-        <div className="flex gap-4">
-          <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 font-semibold rounded-lg text-sm">
-            {user ? `${user.username}` : 'Guest Mode'}
-          </div>
+      <div className="bg-white px-6 py-4 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4 z-10">
+        <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 font-semibold rounded-lg text-sm whitespace-nowrap">
+          {user ? `Hello, ${user.username}` : '👀 Guest Mode'}
         </div>
-        <div className="text-sm text-gray-500 font-semibold">
-          Places: <span className="text-blue-600">{locations.length}</span>
+
+        <div className="flex-1 w-full flex justify-center">
+          <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+        </div>
+
+        <div className="text-sm text-gray-500 font-semibold whitespace-nowrap">
+          Found: <span className="text-blue-600">{filteredLocations.length}</span> / {locations.length}
         </div>
       </div>
 
@@ -70,10 +81,10 @@ export default function Home() {
           </h2>
           
           <div className="flex-1 overflow-y-auto space-y-3 pr-2">
-            {locations.length === 0 ? (
-              <p className="text-sm text-gray-500 italic">No places added yet.</p>
+            {filteredLocations.length === 0 ? (
+              <p className="text-sm text-gray-500 italic">Not found</p>
             ) : (
-              locations.map((loc) => (
+              filteredLocations.map((loc) => (
                 <div 
                   key={loc.id} 
                   onClick={() => setActiveCoords([Number(loc.latitude), Number(loc.longitude)])}
@@ -96,7 +107,7 @@ export default function Home() {
             
             <MapFlyController coords={activeCoords} />
 
-            {locations.map((loc) => (
+            {filteredLocations.map((loc) => (
               <Marker key={loc.id} position={[Number(loc.latitude), Number(loc.longitude)]}>
                 <Popup>
                   <div className="font-sans min-w-[200px]">
