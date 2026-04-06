@@ -18,7 +18,7 @@ export default function TopBar({ user, searchTerm, setSearchTerm, filteredCount,
   return (
     <div className="bg-white px-6 py-4 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4 z-10">
       <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 font-semibold rounded-lg text-sm whitespace-nowrap">
-        {user ? `Hello, ${user.username}` : '👀 Guest Mode'}
+        {user ? `Hello, ${user.username}` : 'Guest Mode'}
       </div>
       
       <div className="flex-1 w-full flex justify-center">
