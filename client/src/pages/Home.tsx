@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import TopBar from '../components/TopBar';
-import Sidebar from '../components/SideBar'; 
+import Sidebar from '../components/SideBar';
 import MapView from '../components/MapView';
+import AddLocationModal from '../components/AddLocationModal';
 
 interface Location {
   id: number;
@@ -15,6 +16,8 @@ export default function Home() {
   const [locations, setLocations] = useState<Location[]>([]);
   const [activeCoords, setActiveCoords] = useState<[number, number] | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [newLocationCoords, setNewLocationCoords] = useState<[number, number] | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
@@ -23,29 +26,36 @@ export default function Home() {
     fetch('http://localhost:5000/api/locations')
       .then(res => res.json())
       .then(data => setLocations(data))
-      .catch(err => console.error("Error loading locations:", err));
+      .catch(err => console.error("Error loading:", err));
   }, []);
 
-  const handleAddLocation = async (title: string, description: string, lat: number, lng: number) => {
+  const handleModalSubmit = async (title: string, description: string) => {
+    if (!newLocationCoords || !user) return;
+
     try {
       const response = await fetch('http://localhost:5000/api/locations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: user.id, title, description, latitude: lat, longitude: lng })
+        body: JSON.stringify({ 
+          user_id: user.id, 
+          title, 
+          description, 
+          latitude: newLocationCoords[0], 
+          longitude: newLocationCoords[1] 
+        })
       });
 
       if (response.ok) {
         const savedLocation = await response.json();
         setLocations([...locations, savedLocation]);
-        return true;
+        setIsModalOpen(false);
+        setNewLocationCoords(null);
       } else {
         alert('Error saving location.');
-        return false;
       }
     } catch (err) {
       console.error(err);
-      alert('No connection to the server.');
-      return false;
+      alert('No connection to server.');
     }
   };
 
@@ -56,33 +66,42 @@ export default function Home() {
     return titleMatch || descMatch;
   });
 
+  const handleTopBarAddClick = () => {
+    const centerOfSofia: [number, number] = [42.6977, 23.3219];
+    if (!newLocationCoords) setNewLocationCoords(centerOfSofia); 
+    setActiveCoords(centerOfSofia); 
+  };
+
   return (
     <div className="flex flex-col h-full bg-gray-100 p-6 gap-6 font-sans">
-      
       <TopBar 
         user={user} 
         searchTerm={searchTerm} 
         setSearchTerm={setSearchTerm} 
         filteredCount={filteredLocations.length} 
         totalCount={locations.length} 
+        onAddClick={handleTopBarAddClick}
       />
 
       <div className="flex flex-1 gap-6 min-h-0">
-        
-        <Sidebar 
-          locations={filteredLocations} 
-          onLocationClick={setActiveCoords} 
-        />
+        <Sidebar locations={filteredLocations} onLocationClick={setActiveCoords} />
         
         <MapView 
           locations={filteredLocations} 
           activeCoords={activeCoords}
           setActiveCoords={setActiveCoords}
           user={user}
-          onAddLocation={handleAddLocation}
+          newLocationCoords={newLocationCoords}
+          setNewLocationCoords={setNewLocationCoords}
+          onOpenModal={() => setIsModalOpen(true)}
         />
-
       </div>
+
+      <AddLocationModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onSubmit={handleModalSubmit} 
+      />
     </div>
   );
 }
