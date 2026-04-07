@@ -12,16 +12,33 @@ interface TopBarProps {
   setSearchTerm: (value: string) => void;
   filteredCount: number;
   totalCount: number;
+  onAddClick: () => void;
 }
 
 export default function TopBar({ user, searchTerm, setSearchTerm, filteredCount, totalCount }: TopBarProps) {
+  const handleAddClick = () => {
+    alert("To add a new location, simply click on its exact spot on the map!");
+  };
+
   return (
     <div className="bg-white px-6 py-4 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4 z-10">
-      <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 font-semibold rounded-lg text-sm whitespace-nowrap">
-        {user ? `Hello, ${user.username}` : 'Guest Mode'}
+  
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 font-semibold rounded-lg text-sm whitespace-nowrap">
+          {user ? `Hello, ${user.username}` : 'Guest Mode'}
+        </div>
+        
+        {user && (
+          <button 
+            onClick={handleAddClick}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg text-sm hover:bg-blue-700 hover:shadow-md transition-all active:scale-95 whitespace-nowrap"
+          >
+          Add Location
+          </button>
+        )}
       </div>
       
-      <div className="flex-1 w-full flex justify-center">
+      <div className="flex-1 w-full flex justify-center max-w-lg">
         <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       </div>
 
