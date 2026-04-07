@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -31,8 +31,10 @@ interface MapViewProps {
   locations: Location[];
   activeCoords: [number, number] | null;
   setActiveCoords: (coords: [number, number] | null) => void;
-  user: User | null; 
-  onAddLocation: (title: string, description: string, lat: number, lng: number) => Promise<boolean>;
+  user: User | null;
+  newLocationCoords: [number, number] | null;
+  setNewLocationCoords: (coords: [number, number] | null) => void;
+  onOpenModal: () => void;
 }
 
 function MapFlyController({ coords }: { coords: [number, number] | null }) {
@@ -43,38 +45,24 @@ function MapFlyController({ coords }: { coords: [number, number] | null }) {
   return null;
 }
 
-export default function MapView({ locations, activeCoords, setActiveCoords, user, onAddLocation }: MapViewProps) {
+export default function MapView({ 
+  locations, activeCoords, setActiveCoords, user, newLocationCoords, setNewLocationCoords, onOpenModal
+}: MapViewProps) {
   const center: [number, number] = [42.6977, 23.3219];
-  const [newLocationCoords, setNewLocationCoords] = useState<{lat: number, lng: number} | null>(null);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
 
   function MapClickHandler() {
     useMapEvents({
       click(e) {
         if (user) {
-          setNewLocationCoords(e.latlng);
+          setNewLocationCoords([e.latlng.lat, e.latlng.lng]);
           setActiveCoords(null);
         } else {
-          alert('You need to be logged in to add new locations!');
+          alert('You must be logged in to add locations!');
         }
       }
     });
     return null;
   }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newLocationCoords) return;
-
-    const success = await onAddLocation(title, description, newLocationCoords.lat, newLocationCoords.lng);
-    
-    if (success) {
-      setNewLocationCoords(null);
-      setTitle('');
-      setDescription('');
-    }
-  };
 
   return (
     <div className="flex-1 rounded-xl shadow-sm border border-gray-200 overflow-hidden relative z-0">
@@ -96,14 +84,30 @@ export default function MapView({ locations, activeCoords, setActiveCoords, user
         ))}
 
         {newLocationCoords && (
-          <Marker position={newLocationCoords}>
+          <Marker 
+            position={newLocationCoords}
+            draggable={true}
+            eventHandlers={{
+              dragend: (e) => {
+                const marker = e.target;
+                const position = marker.getLatLng();
+                setNewLocationCoords([position.lat, position.lng]);
+              }
+            }}
+          >
             <Popup eventHandlers={{ remove: () => setNewLocationCoords(null) }}>
-              <form onSubmit={handleSubmit} className="flex flex-col gap-3 min-w-[200px] p-1 font-sans">
-                <h3 className="font-bold text-gray-800 border-b pb-2">New Work Location</h3>
-                <input type="text" placeholder="Location name" required className="w-full px-3 py-2 border rounded text-sm" value={title} onChange={(e) => setTitle(e.target.value)} />
-                <textarea placeholder="Brief description..." className="w-full px-3 py-2 border rounded text-sm resize-none h-20" value={description} onChange={(e) => setDescription(e.target.value)} />
-                <button type="submit" className="w-full bg-blue-600 text-white font-bold py-2 rounded text-sm">Save Location</button>
-              </form>
+              <div className="text-center font-sans p-2 min-w-[180px]">
+                <div className="bg-blue-50 text-blue-700 text-xs font-bold px-2 py-1 rounded mb-3 inline-block">
+                  Selection Mode
+                </div>
+                <p className="text-sm text-gray-600 mb-3 leading-snug">Drag this pin to the exact location, then click below.</p>
+                <button 
+                  onClick={onOpenModal}
+                  className="w-full px-4 py-2.5 bg-gray-900 text-white font-bold rounded-lg hover:bg-black transition-transform active:scale-95 text-sm shadow-md flex items-center justify-center gap-2"
+                >
+                Confirm Spot
+                </button>
+              </div>
             </Popup>
           </Marker>
         )}
