@@ -3,28 +3,29 @@ import { useState } from 'react';
 interface AddLocationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (title: string, description: string) => void;
+  onSubmit: (title: string, description: string, imageUrl: string) => void; 
 }
 
 export default function AddLocationModal({ isOpen, onClose, onSubmit }: AddLocationModalProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
 
   if (!isOpen) return null;
 
-  // function for close modal and reset form
   const handleClose = () => {
     setTitle('');
     setDescription('');
+    setImageUrl('');
     onClose();
   };
 
-  // function for save information and close modal
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(title, description);
+    onSubmit(title, description, imageUrl); 
     setTitle('');
     setDescription('');
+    setImageUrl('');
   };
 
   return (
@@ -55,16 +56,27 @@ export default function AddLocationModal({ isOpen, onClose, onSubmit }: AddLocat
           </div>
           
           <div className="space-y-1.5">
-            <label className="text-sm font-bold text-gray-700 flex items-center gap-1.5">Useful information</label>
+            <label className="text-sm font-bold text-gray-700 flex items-center gap-1.5">Image URL</label>
+            <input 
+              type="url" 
+              placeholder="https://imgur.com/your-photo.jpg" 
+              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-sm font-bold text-gray-700 flex items-center gap-1.5">Useful info</label>
             <textarea 
               placeholder="Good Wi-Fi? Quiet? Outlets available?" 
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm resize-none h-24"
+              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm resize-none h-20"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
           
-          <div className="flex gap-3 mt-4 pt-4 border-t border-gray-100">
+          <div className="flex gap-3 mt-2 pt-4 border-t border-gray-100">
             <button type="button" onClick={handleClose} className="flex-1 px-4 py-3 bg-white border border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50 text-sm">
               Cancel
             </button>
