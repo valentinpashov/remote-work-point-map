@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import TopBar from '../components/TopBar';
-import Sidebar from '../components/SideBar';
+import Sidebar from '../components/SideBar'; 
 import MapView from '../components/MapView';
 import AddLocationModal from '../components/AddLocationModal';
 
@@ -10,15 +10,15 @@ interface Location {
   description: string;
   latitude: string | number;
   longitude: string | number;
+  image_url?: string;
 }
 
 export default function Home() {
   const [locations, setLocations] = useState<Location[]>([]);
   const [activeCoords, setActiveCoords] = useState<[number, number] | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');  
   const [newLocationCoords, setNewLocationCoords] = useState<[number, number] | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
 
@@ -29,7 +29,7 @@ export default function Home() {
       .catch(err => console.error("Error loading:", err));
   }, []);
 
-  const handleModalSubmit = async (title: string, description: string) => {
+  const handleModalSubmit = async (title: string, description: string, imageUrl: string) => {
     if (!newLocationCoords || !user) return;
 
     try {
@@ -41,7 +41,8 @@ export default function Home() {
           title, 
           description, 
           latitude: newLocationCoords[0], 
-          longitude: newLocationCoords[1] 
+          longitude: newLocationCoords[1],
+          image_url: imageUrl
         })
       });
 
