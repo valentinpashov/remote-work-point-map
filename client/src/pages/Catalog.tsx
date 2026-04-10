@@ -5,6 +5,7 @@ interface Location {
   id: number;
   title: string;
   description: string;
+  image_url?: string; 
 }
 
 export default function Catalog() {
@@ -33,6 +34,29 @@ export default function Catalog() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {locations.map(loc => (
             <div key={loc.id} className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 flex flex-col">
+              
+              <div className="h-64 overflow-hidden relative bg-gray-50 flex items-center justify-center">
+                
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-red-400/80 bg-red-50/50">
+                  <svg className="w-10 h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <span className="text-sm font-bold tracking-wide uppercase">Broken Link</span>
+                </div>
+
+                <img 
+                  src={loc.image_url || `https://picsum.photos/seed/${loc.id + 100}/800/600`} 
+                  alt={loc.title} 
+                  className="w-full h-full object-cover relative z-10 group-hover:scale-110 transition-transform duration-700" 
+                  onError={(e) => { 
+                    e.currentTarget.style.display = 'none'; 
+                  }}
+                />
+
+                <div className="absolute top-4 right-4 z-20 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-gray-800 shadow-sm">
+                  Workspace
+                </div>
+              </div>
               
               <div className="p-6 flex flex-col flex-1">
                 <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">
