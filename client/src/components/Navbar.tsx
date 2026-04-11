@@ -22,7 +22,7 @@ export default function Navbar() {
       <div className="flex justify-start">
         <Link to="/" className="flex items-center cursor-pointer">
           <span className="text-2xl font-extrabold text-gray-800 tracking-tight">
-            Work<span className="text-blue-600">Station</span>
+            Remote - Work<span className="text-blue-600">Point</span>
           </span>
         </Link>
       </div>
