@@ -6,6 +6,7 @@ import AddLocationModal from '../components/AddLocationModal';
 
 interface Location {
   id: number;
+  user_id: number;
   title: string;
   description: string;
   latitude: string | number;
@@ -22,18 +23,20 @@ export default function Home() {
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
 
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
   useEffect(() => {
-    fetch('http://localhost:5000/api/locations')
+    fetch(`${apiUrl}/api/locations`)
       .then(res => res.json())
       .then(data => setLocations(data))
       .catch(err => console.error("Error loading:", err));
-  }, []);
+  }, [apiUrl]);
 
   const handleModalSubmit = async (title: string, description: string, imageUrl: string) => {
     if (!newLocationCoords || !user) return;
 
     try {
-      const response = await fetch('http://localhost:5000/api/locations', {
+      const response = await fetch(`${apiUrl}/api/locations`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -53,6 +56,30 @@ export default function Home() {
         setNewLocationCoords(null);
       } else {
         alert('Error saving location.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('No connection to server.');
+    }
+  };
+
+  const handleDeleteLocation = async (locationId: number) => {
+    if (!user) return;
+    if (!window.confirm("Are you sure you want to delete this workspace?")) return;
+
+    try {
+      const response = await fetch(`${apiUrl}/api/locations/${locationId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: user.id })
+      });
+
+      if (response.ok) {
+        setLocations(locations.filter(loc => loc.id !== locationId));
+        setActiveCoords(null);
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Error deleting workspace.');
       }
     } catch (err) {
       console.error(err);
@@ -95,6 +122,7 @@ export default function Home() {
           newLocationCoords={newLocationCoords}
           setNewLocationCoords={setNewLocationCoords}
           onOpenModal={() => setIsModalOpen(true)}
+          onDeleteLocation={handleDeleteLocation} 
         />
       </div>
 
