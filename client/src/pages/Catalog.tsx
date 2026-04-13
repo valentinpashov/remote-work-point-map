@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 interface Location {
   id: number;
+  user_id: number; 
   title: string;
   description: string;
   image_url?: string; 
@@ -10,13 +11,40 @@ interface Location {
 
 export default function Catalog() {
   const [locations, setLocations] = useState<Location[]>([]);
+  
+  const userString = localStorage.getItem('user');
+  const user = userString ? JSON.parse(userString) : null;
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/locations')
+    fetch(`${apiUrl}/api/locations`)
       .then(res => res.json())
       .then(data => setLocations(data))
       .catch(err => console.error("Error loading locations:", err));
-  }, []);
+  }, [apiUrl]);
+
+  const handleDelete = async (locationId: number) => {
+    if (!user) return;
+    if (!window.confirm("Are you sure you want to delete this workspace?")) return;
+
+    try {
+      const response = await fetch(`${apiUrl}/api/locations/${locationId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: user.id })
+      });
+
+      if (response.ok) {
+        setLocations(locations.filter(loc => loc.id !== locationId));
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Error deleting workspace.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('No connection to server.');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 pt-12 pb-20 font-sans">
@@ -33,8 +61,8 @@ export default function Catalog() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {locations.map(loc => (
-            <div key={loc.id} className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 flex flex-col">
-              
+            <div key={loc.id} className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 flex flex-col relative">
+
               <div className="h-64 overflow-hidden relative bg-gray-50 flex items-center justify-center">
                 
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-red-400/80 bg-red-50/50">
