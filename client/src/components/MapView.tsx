@@ -15,6 +15,7 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 interface Location {
   id: number;
+  user_id: number;
   title: string;
   description: string;
   latitude: string | number;
@@ -35,6 +36,7 @@ interface MapViewProps {
   newLocationCoords: [number, number] | null;
   setNewLocationCoords: (coords: [number, number] | null) => void;
   onOpenModal: () => void;
+  onDeleteLocation: (id: number) => void; 
 }
 
 function MapFlyController({ coords }: { coords: [number, number] | null }) {
@@ -46,7 +48,7 @@ function MapFlyController({ coords }: { coords: [number, number] | null }) {
 }
 
 export default function MapView({ 
-  locations, activeCoords, setActiveCoords, user, newLocationCoords, setNewLocationCoords, onOpenModal
+  locations, activeCoords, setActiveCoords, user, newLocationCoords, setNewLocationCoords, onOpenModal, onDeleteLocation
 }: MapViewProps) {
   const center: [number, number] = [42.6977, 23.3219];
 
@@ -76,7 +78,19 @@ export default function MapView({
           <Marker key={loc.id} position={[Number(loc.latitude), Number(loc.longitude)]}>
             <Popup>
               <div className="font-sans min-w-[200px]">
-                <h3 className="font-bold text-lg text-gray-800">{loc.title}</h3>
+                <div className="flex justify-between items-start gap-3">
+                  <h3 className="font-bold text-lg text-gray-800">{loc.title}</h3>
+
+                  {user && user.id === loc.user_id && (
+                    <button 
+                      onClick={() => onDeleteLocation(loc.id)}
+                      className="text-red-400 hover:text-red-600 transition-colors p-1"
+                      title="Delete this workspace"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                  )}
+                </div>
                 <p className="text-sm text-gray-600 mt-1">{loc.description}</p>
               </div>
             </Popup>
