@@ -134,6 +134,31 @@ app.post('/api/locations', async (req, res) => {
     }
 });
 
+// Delete a location
+app.delete('/api/locations/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { user_id } = req.body;
+
+        const location = await pool.query("SELECT * FROM locations WHERE id = $1", [id]);
+        
+        if (location.rows.length === 0) {
+            return res.status(404).json({ error: "Location not found!" });
+        }
+
+        if (location.rows[0].user_id !== user_id) {
+            return res.status(403).json({ error: "Unauthorized! You can only delete your own workspaces." });
+        }
+
+        await pool.query("DELETE FROM locations WHERE id = $1", [id]);
+        res.json({ message: "Workspace deleted successfully!" });
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server error while deleting");
+    }
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`The server is listening on port ${PORT}`);
