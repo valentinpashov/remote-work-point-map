@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import ConfirmDeleteModal from '../components/ConfirmDeleteModal';
 
 interface Location {
   id: number;
-  user_id: number; 
+  user_id: number;
   title: string;
   description: string;
   image_url?: string; 
@@ -11,6 +12,7 @@ interface Location {
 
 export default function Catalog() {
   const [locations, setLocations] = useState<Location[]>([]);
+  const [deletingId, setDeletingId] = useState<number | null>(null); 
   
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
@@ -23,26 +25,28 @@ export default function Catalog() {
       .catch(err => console.error("Error loading locations:", err));
   }, [apiUrl]);
 
-  const handleDelete = async (locationId: number) => {
-    if (!user) return;
-    if (!window.confirm("Are you sure you want to delete this workspace?")) return;
+  const executeDelete = async () => {
+    if (!user || deletingId === null) return;
 
     try {
-      const response = await fetch(`${apiUrl}/api/locations/${locationId}`, {
+      const response = await fetch(`${apiUrl}/api/locations/${deletingId}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: user.id })
       });
 
       if (response.ok) {
-        setLocations(locations.filter(loc => loc.id !== locationId));
+        setLocations(locations.filter(loc => loc.id !== deletingId));
+        setDeletingId(null);
       } else {
         const data = await response.json();
         alert(data.error || 'Error deleting workspace.');
+        setDeletingId(null);
       }
     } catch (err) {
       console.error(err);
       alert('No connection to server.');
+      setDeletingId(null);
     }
   };
 
@@ -65,7 +69,7 @@ export default function Catalog() {
               
               {user && user.id === loc.user_id && (
                 <button 
-                  onClick={() => handleDelete(loc.id)}
+                  onClick={() => setDeletingId(loc.id)} 
                   className="absolute top-4 left-4 z-30 bg-red-500/90 hover:bg-red-600 text-white p-2 rounded-full shadow-md backdrop-blur transition-colors"
                   title="Delete Workspace"
                 >
@@ -103,7 +107,7 @@ export default function Catalog() {
                 <p className="text-gray-600 text-sm line-clamp-3 mb-6 flex-1 leading-relaxed">
                   {loc.description || "No description added for this workspace."}
                 </p>
-                
+
                 <Link 
                   to="/" 
                   className="inline-flex items-center gap-2 text-blue-600 font-bold text-sm hover:text-blue-800 transition-colors bg-blue-50 hover:bg-blue-100 w-max px-4 py-2 rounded-lg"
@@ -124,6 +128,13 @@ export default function Catalog() {
         </div>
 
       </div>
+
+      <ConfirmDeleteModal 
+        isOpen={deletingId !== null} 
+        onClose={() => setDeletingId(null)} 
+        onConfirm={executeDelete} 
+      />
+      
     </div>
   );
 }
