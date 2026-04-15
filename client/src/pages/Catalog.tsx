@@ -13,6 +13,7 @@ interface Location {
 export default function Catalog() {
   const [locations, setLocations] = useState<Location[]>([]);
   const [deletingId, setDeletingId] = useState<number | null>(null); 
+  const [searchTerm, setSearchTerm] = useState('');
   
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
@@ -50,11 +51,19 @@ export default function Catalog() {
     }
   };
 
+  const filteredLocations = locations.filter(loc => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      loc.title.toLowerCase().includes(searchLower) || 
+      (loc.description && loc.description.toLowerCase().includes(searchLower))
+    );
+  });
+
   return (
     <div className="min-h-screen bg-gray-50 pt-12 pb-20 font-sans">
       <div className="max-w-7xl mx-auto px-6">
         
-        <div className="text-center mb-16 space-y-4">
+        <div className="text-center mb-12 space-y-4">
           <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight">
             Discover Your Perfect Workspace
           </h1>
@@ -63,8 +72,23 @@ export default function Catalog() {
           </p>
         </div>
 
+        <div className="max-w-2xl mx-auto mb-12 relative">
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+          <input
+            type="text"
+            placeholder="Search workspaces by name or info..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="block w-full pl-12 pr-4 py-3.5 border border-gray-200 rounded-2xl bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm hover:shadow"
+          />
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {locations.map(loc => (
+          {filteredLocations.map(loc => (
             <div key={loc.id} className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 flex flex-col relative">
               
               {user && user.id === loc.user_id && (
@@ -110,7 +134,7 @@ export default function Catalog() {
 
                 <Link 
                   to="/" 
-                  className="inline-flex items-center gap-2 text-blue-600 font-bold text-sm hover:text-blue-800 transition-colors bg-blue-50 hover:bg-blue-100 w-max px-4 py-2 rounded-lg"
+                  className="inline-flex items-center gap-2 text-blue-600 font-bold text-sm hover:text-blue-800 transition-colors bg-blue-50 hover:bg-blue-100 w-max px-4 py-2 rounded-lg mt-auto"
                 >
                   View on Map <span>→</span>
                 </Link>
