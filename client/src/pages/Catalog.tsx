@@ -8,7 +8,7 @@ interface Location {
   title: string;
   description: string;
   image_url?: string; 
-  city?: string; 
+  city?: string;
 }
 
 export default function Catalog() {
@@ -136,8 +136,8 @@ export default function Catalog() {
                   onError={(e) => { e.currentTarget.style.display = 'none'; }}
                 />
 
-               <div className="absolute top-4 right-4 z-20 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-gray-800 shadow-sm">
-                  Workspace
+                <div className="absolute top-4 right-4 z-20 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-gray-800 shadow-sm">
+                  {loc.city ? `🏙️ ${loc.city}` : 'Workspace'}
                 </div>
               </div>
               
@@ -145,8 +145,8 @@ export default function Catalog() {
                 <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">
                   {loc.title}
                 </h3>
-                  <p className="text-gray-600 text-sm line-clamp-3 mb-6 flex-1 leading-relaxed">
-                  {loc.description || "No description added for this workspace."}
+                <p className="text-gray-600 text-sm line-clamp-3 mb-6 flex-1">
+                  {loc.description || "No description added."}
                 </p>
 
                 <Link 
@@ -156,9 +156,31 @@ export default function Catalog() {
                   View on Map <span>→</span>
                 </Link>
               </div>
-
             </div>
           ))}
+
+          {filteredLocations.length === 0 && locations.length > 0 && (
+            <div className="col-span-full text-center py-20 bg-white rounded-2xl border-2 border-dashed border-gray-200 shadow-inner">
+              <div className="text-5xl mb-4">🔍</div>
+              <h3 className="font-bold text-gray-800 text-xl mb-2">No workspaces found</h3>
+              <p className="text-gray-500">
+                Try adjusting your search terms or selecting a different city.
+              </p>
+              <button 
+                onClick={() => { setSearchTerm(''); setSelectedCity('All'); }}
+                className="mt-6 px-6 py-2.5 bg-blue-50 text-blue-600 font-bold rounded-lg hover:bg-blue-100 transition-colors"
+              >
+                Clear Filters
+              </button>
+            </div>
+          )}
+
+          {locations.length === 0 && (
+            <div className="col-span-full text-center py-20 bg-white rounded-2xl border-2 border-dashed border-gray-100 shadow-inner">
+              <h3 className="font-bold text-gray-800 text-lg mb-2">No locations yet.</h3>
+              <p className="text-sm text-gray-500">Be the first to add a workspace on the map!</p>
+            </div>
+          )}
         </div>
       </div>
 
