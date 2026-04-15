@@ -116,15 +116,15 @@ app.get('/api/locations', async (req, res) => {
 // Save a new location to the database
 app.post('/api/locations', async (req, res) => {
     try {
-        const { user_id, title, description, latitude, longitude, image_url } = req.body;
+        const { user_id, title, description, latitude, longitude, image_url, city, street } = req.body;
 
         if (!user_id || !title || !latitude || !longitude) {
             return res.status(400).json({ error: "Please fill in all required fields!" });
         }
 
         const newLocation = await pool.query(
-            "INSERT INTO locations (user_id, title, description, latitude, longitude, image_url) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-            [user_id, title, description, latitude, longitude, image_url]
+            "INSERT INTO locations (user_id, title, description, latitude, longitude, image_url, city, street) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
+            [user_id, title, description, latitude, longitude, image_url, city, street]
         );
         res.json(newLocation.rows[0]);
 
