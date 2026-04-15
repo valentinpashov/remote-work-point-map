@@ -19,6 +19,8 @@ export default function AddLocationModal({ isOpen, onClose, onSubmit }: AddLocat
     setTitle('');
     setDescription('');
     setImageUrl('');
+    setCity(''); 
+    setStreet(''); 
     onClose();
   };
 
@@ -28,6 +30,8 @@ export default function AddLocationModal({ isOpen, onClose, onSubmit }: AddLocat
     setTitle('');
     setDescription('');
     setImageUrl('');
+    setCity('');
+    setStreet('');
   };
 
   return (
