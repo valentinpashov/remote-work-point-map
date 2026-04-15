@@ -12,6 +12,8 @@ interface Location {
   latitude: string | number;
   longitude: string | number;
   image_url?: string;
+  city?: string;
+  street?: string;
 }
 
 export default function Home() {
@@ -32,7 +34,7 @@ export default function Home() {
       .catch(err => console.error("Error loading:", err));
   }, [apiUrl]);
 
-  const handleModalSubmit = async (title: string, description: string, imageUrl: string) => {
+  const handleModalSubmit = async (title: string, description: string, imageUrl: string, city: string, street: string) => {
     if (!newLocationCoords || !user) return;
 
     try {
@@ -45,7 +47,9 @@ export default function Home() {
           description, 
           latitude: newLocationCoords[0], 
           longitude: newLocationCoords[1],
-          image_url: imageUrl
+          image_url: imageUrl,
+          city: city,     
+          street: street  
         })
       });
 
