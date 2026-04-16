@@ -3,6 +3,7 @@ import TopBar from '../components/TopBar';
 import Sidebar from '../components/SideBar'; 
 import MapView from '../components/MapView';
 import AddLocationModal from '../components/AddLocationModal';
+import InstructionToast from '../components/InstructionToast';
 
 interface Location {
   id: number;
@@ -22,6 +23,8 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState('');  
   const [newLocationCoords, setNewLocationCoords] = useState<[number, number] | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showInstruction, setShowInstruction] = useState(false);
+  
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
 
@@ -102,6 +105,7 @@ export default function Home() {
     const centerOfSofia: [number, number] = [42.6977, 23.3219];
     if (!newLocationCoords) setNewLocationCoords(centerOfSofia); 
     setActiveCoords(centerOfSofia); 
+    setShowInstruction(true);
   };
 
   return (
@@ -134,6 +138,11 @@ export default function Home() {
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         onSubmit={handleModalSubmit} 
+      />
+
+      <InstructionToast 
+        isVisible={showInstruction} 
+        onClose={() => setShowInstruction(false)} 
       />
     </div>
   );
