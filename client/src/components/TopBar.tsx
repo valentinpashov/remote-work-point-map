@@ -15,9 +15,9 @@ interface TopBarProps {
   onAddClick: () => void;
 }
 
-export default function TopBar({ user, searchTerm, setSearchTerm, filteredCount, totalCount }: TopBarProps) {
+export default function TopBar({ user, searchTerm, setSearchTerm, filteredCount, totalCount, onAddClick }: TopBarProps) {  
   const handleAddClick = () => {
-    alert("To add a new location, simply click on its exact spot on the map!");
+    onAddClick();
   };
 
   return (
@@ -29,7 +29,7 @@ export default function TopBar({ user, searchTerm, setSearchTerm, filteredCount,
         </div>
         
         {user && (
-          <button 
+            <button 
             onClick={handleAddClick}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg text-sm hover:bg-blue-700 hover:shadow-md transition-all active:scale-95 whitespace-nowrap"
           >
