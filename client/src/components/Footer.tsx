@@ -7,6 +7,16 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-10">
 
+          <div className="space-y-4">
+            <Link to="/" className="flex items-center">
+              <span className="text-2xl font-extrabold text-white tracking-tight">
+                Remote - Work<span className="text-blue-500">Point</span>
+              </span>
+            </Link>
+            <p className="text-sm leading-relaxed max-w-xs">
+              Discover and share the world's best workspaces for digital nomads and remote professionals.
+            </p>
+          </div>
 
 
         </div>
