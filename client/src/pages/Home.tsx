@@ -109,7 +109,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-100 p-6 gap-6 font-sans">
+    <div className="flex flex-col bg-gray-100 p-6 gap-6 font-sans">
       <TopBar 
         user={user} 
         searchTerm={searchTerm} 
@@ -119,7 +119,7 @@ export default function Home() {
         onAddClick={handleTopBarAddClick}
       />
 
-      <div className="flex flex-1 gap-6 min-h-0">
+      <div className="flex flex-1 gap-6 min-h-[75vh]">
         <Sidebar locations={filteredLocations} onLocationClick={setActiveCoords} />
         
         <MapView 
