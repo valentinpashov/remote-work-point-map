@@ -4,13 +4,15 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Catalog from './pages/Catalog';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 
 function App() {
   return (
     <BrowserRouter>
-      <div className="flex flex-col h-screen">
+      <div className="flex flex-col min-h-screen">
+        
         <Navbar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/catalog" element={<Catalog />} />
@@ -18,6 +20,8 @@ function App() {
             <Route path="/register" element={<Register />} />
           </Routes>
         </div>
+
+        <Footer />
       </div>
     </BrowserRouter>
   );
