@@ -18,7 +18,17 @@ export default function Footer() {
             </p>
           </div>
 
-
+          <div className="md:justify-self-end">
+            <h4 className="text-white font-bold mb-5 uppercase text-xs tracking-widest">Navigation</h4>
+            <ul className="space-y-3 text-sm">
+              <li>
+                <Link to="/" className="hover:text-blue-400 transition-colors">Map Explorer</Link>
+              </li>
+              <li>
+                <Link to="/catalog" className="hover:text-blue-400 transition-colors">Workspace Gallery</Link>
+              </li>
+            </ul>
+          </div>
         </div>
 
         <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium">
