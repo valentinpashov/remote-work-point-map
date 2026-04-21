@@ -3,6 +3,17 @@ import { Link } from 'react-router-dom';
 export default function NotFound() {
   return (
     <div className="min-h-[80vh] flex flex-col items-center justify-center px-6 text-center">
+      
+      <div className="relative mb-8 group">
+        <div className="absolute inset-0 bg-blue-500 blur-[80px] opacity-20 rounded-full animate-pulse"></div>
+        <h1 className="text-[12rem] leading-none font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-slate-800 to-slate-400 select-none relative z-10 drop-shadow-sm transition-transform duration-500 group-hover:scale-105">
+          404
+        </h1>
+        {/* Малка иконка на изгубено пинче */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white bg-blue-600 rounded-full p-4 shadow-xl z-20 transform -rotate-12 group-hover:rotate-0 transition-all duration-500">
+           <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+        </div>
+      </div>
 
       <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 tracking-tight">
         Oops! Looks like you're lost.
