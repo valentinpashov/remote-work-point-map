@@ -25,11 +25,13 @@ export default function LocationReviewsModal({ isOpen, onClose, locationId, loca
   const [newRating, setNewRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
 
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
     if (isOpen && locationId) {
+      setStatusMessage(null);
       fetch(`${apiUrl}/api/locations/${locationId}/reviews`)
         .then(res => res.ok ? res.json() : [])
         .then(data => setReviews(data))
@@ -41,8 +43,10 @@ export default function LocationReviewsModal({ isOpen, onClose, locationId, loca
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setStatusMessage(null);
+
     if (newRating === 0) {
-      alert("Please select a rating from 1 to 5 stars.");
+      setStatusMessage({ type: 'error', text: "Please select a rating from 1 to 5 stars." });
       return;
     }
 
@@ -62,12 +66,16 @@ export default function LocationReviewsModal({ isOpen, onClose, locationId, loca
         const savedReview = await response.json();
         setReviews([savedReview, ...reviews]);
         setNewRating(0); 
+        setStatusMessage({ type: 'success', text: "Rating saved successfully! 🎉" });
+        
+        setTimeout(() => setStatusMessage(null), 3000);
       } else {
-        alert("Error saving rating.");
+        const data = await response.json().catch(() => ({}));
+        setStatusMessage({ type: 'error', text: data.error || "Error saving rating." });
       }
     } catch (err) {
       console.error(err);
-      alert("No connection to server.");
+      setStatusMessage({ type: 'error', text: "No connection to server." });
     } finally {
       setIsLoading(false);
     }
@@ -107,6 +115,15 @@ export default function LocationReviewsModal({ isOpen, onClose, locationId, loca
           {user ? (
             <div className="w-full flex flex-col items-center">
               <h4 className="text-sm font-bold text-gray-800 mb-3">Rate this workspace</h4>
+            
+              {statusMessage && (
+                <div className={`w-full mb-4 px-4 py-3 rounded-xl text-sm font-bold flex items-center justify-center animate-pulse transition-all duration-300 ${
+                  statusMessage.type === 'error' ? 'bg-red-50 text-red-600 border border-red-100' : 'bg-green-50 text-green-600 border border-green-100'
+                }`}>
+                  {statusMessage.text}
+                </div>
+              )}
+
               <form onSubmit={handleSubmit} className="flex flex-col items-center gap-5 w-full">
                 
                 <div className="flex gap-2 cursor-pointer">
