@@ -82,7 +82,10 @@ export default function LocationReviewsModal({ isOpen, onClose, locationId, loca
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col">
         
         <div className="px-6 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 flex justify-between items-center relative shrink-0">
-
+          <div>
+            <h3 className="font-extrabold text-white text-xl tracking-tight">Location Rating</h3>
+            <p className="text-blue-100 text-xs mt-0.5 font-medium">{locationTitle}</p>
+          </div>
           <button onClick={onClose} className="text-blue-100 hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-full transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
           </button>
@@ -91,6 +94,7 @@ export default function LocationReviewsModal({ isOpen, onClose, locationId, loca
         <div className="p-6 bg-gray-50/50 flex flex-col items-center">
           
           <div className="text-center mb-6">
+            <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-1">Average Rating</h4>
             <div className="text-3xl font-extrabold text-gray-900 flex items-center justify-center gap-2">
               {averageRating !== "No ratings yet" && <span className="text-yellow-400">★</span>}
               {averageRating}
