@@ -176,7 +176,32 @@ app.get('/api/locations/:id/reviews', async (req, res) => {
   }
 });
 
+// Add a new review 
+app.post('/api/locations/:id/reviews', async (req, res) => {
+  try {
+    const { id } = req.params; 
+    const { user_id, username, rating } = req.body;
 
+    const checkVote = await pool.query(
+      'SELECT * FROM ratings WHERE location_id = $1 AND user_id = $2', 
+      [id, user_id]
+    );
+
+    if (checkVote.rows.length > 0) {
+      return res.status(400).json({ error: "You have already rated this location!" });
+    }
+
+    const newRating = await pool.query(
+      'INSERT INTO ratings (location_id, user_id, username, rating) VALUES ($1, $2, $3, $4) RETURNING *',
+      [id, user_id, username, rating]
+    );
+
+    res.json(newRating.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: "Server error while saving rating" });
+  }
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
