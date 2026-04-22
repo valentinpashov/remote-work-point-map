@@ -159,6 +159,25 @@ app.delete('/api/locations/:id', async (req, res) => {
     }
 });
 
+// Get all reviews 
+app.get('/api/locations/:id/reviews', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const result = await pool.query(
+      'SELECT * FROM ratings WHERE location_id = $1 ORDER BY created_at DESC',
+      [id]
+    );
+    
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: "Server error while fetching ratings" });
+  }
+});
+
+
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`The server is listening on port ${PORT}`);
