@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ConfirmDeleteModal from '../components/ConfirmDeleteModal';
+import LocationReviewsModal from '../components/LocationReviewsModal';
 
 interface Location {
   id: number;
@@ -16,6 +17,7 @@ export default function Catalog() {
   const [deletingId, setDeletingId] = useState<number | null>(null); 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCity, setSelectedCity] = useState('All');
+  const [reviewLocation, setReviewLocation] = useState<{id: number, title: string} | null>(null);
   
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
@@ -149,12 +151,21 @@ export default function Catalog() {
                   {loc.description || "No description added."}
                 </p>
 
-                <Link 
-                  to="/" 
-                  className="inline-flex items-center gap-2 text-blue-600 font-bold text-sm hover:text-blue-800 transition-colors bg-blue-50 hover:bg-blue-100 w-max px-4 py-2 rounded-lg mt-auto"
-                >
-                  View on Map <span>→</span>
-                </Link>
+                <div className="flex gap-3 mt-auto">
+                  <Link 
+                    to="/" 
+                    className="inline-flex items-center gap-2 text-blue-600 font-bold text-sm hover:text-blue-800 transition-colors bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg"
+                  >
+                    Map <span>→</span>
+                  </Link>
+                  
+                  <button 
+                    onClick={() => setReviewLocation({ id: loc.id, title: loc.title })}
+                    className="inline-flex items-center gap-1.5 text-slate-600 font-bold text-sm hover:text-slate-900 transition-colors bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-lg"
+                  >
+                    <span className="text-yellow-500 text-base">★</span> Reviews
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -188,6 +199,14 @@ export default function Catalog() {
         isOpen={deletingId !== null} 
         onClose={() => setDeletingId(null)} 
         onConfirm={executeDelete} 
+      />
+
+      <LocationReviewsModal
+        isOpen={reviewLocation !== null}
+        onClose={() => setReviewLocation(null)}
+        locationId={reviewLocation?.id || null}
+        locationTitle={reviewLocation?.title || ''}
+        user={user}
       />
       
     </div>
