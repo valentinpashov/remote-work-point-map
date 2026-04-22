@@ -68,7 +68,7 @@ export default function LocationReviewsModal({ isOpen, onClose, locationId, loca
         setNewRating(0); 
         setStatusMessage({ type: 'success', text: "Rating saved successfully! 🎉" });
         
-        setTimeout(() => setStatusMessage(null), 3000);
+        setTimeout(() => setStatusMessage(null), 5000);
       } else {
         const data = await response.json().catch(() => ({}));
         setStatusMessage({ type: 'error', text: data.error || "Error saving rating." });
